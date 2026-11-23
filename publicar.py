@@ -1,11 +1,12 @@
 """Compila e publica o script do TizenTube TV (este fork) para a TV baixar.
 
 Caminho que a TV faz (APK remendado pela PonteAndroidTV, `atualizar_tizentube.py`):
-  1. o app carrega https://cdn.jsdelivr.net/gh/Kiyotagit/TizenTube@tv-1/carregador.js
+  1. o app carrega https://cdn.jsdelivr.net/gh/Kiyotagit/TizenTube@tv-2/carregador.js
      (endereço do mesmo tamanho do original, trocado dentro do libchrobalt.so; tag fixa);
-  2. o carregador pergunta ao GitHub o commit mais novo do main e carrega
-     https://cdn.jsdelivr.net/gh/Kiyotagit/TizenTube@<commit>/tv/tizentube.js
-     (por commit o jsDelivr entrega na hora; "@main" ficaria até 12 h em cache).
+  2. o carregador carrega https://cdn.jsdelivr.net/gh/Kiyotagit/TizenTube@<commit>/tv/tizentube.js
+     com o último commit que ele conhece e pergunta ao GitHub o mais novo para a PRÓXIMA
+     abertura (por commit o jsDelivr entrega na hora; "@main" ficaria até 12 h em cache).
+     Então uma mudança publicada entra na segunda abertura do app.
 
 Uso (na pasta do repositório):
     python publicar.py "o que mudou"
