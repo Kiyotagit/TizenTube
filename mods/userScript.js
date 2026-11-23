@@ -15,6 +15,7 @@ import "./ui/speedUI.js";
 import "./ui/theme.js";
 import "./ui/settings.js";
 import "./ui/disableWhosWatching.js";
+import "./features/contaPadrao.js"; // TizenTube TV (fork): depois do disableWhosWatching
 import "./features/moreSubtitles.js";
 import "./features/captionStylePersistence.js";
 import "./features/updater.js";

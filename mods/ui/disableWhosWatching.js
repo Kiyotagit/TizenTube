@@ -45,4 +45,9 @@ function disableWhosWatching(value) {
     }
 }
 
-disableWhosWatching(configRead('enableWhoIsWatchingMenu'));
+// TizenTube TV (fork): um erro aqui (ex.: falta uma das chaves) derrubava o script inteiro.
+try {
+    disableWhosWatching(configRead('enableWhoIsWatchingMenu'));
+} catch (e) {
+    console.warn('[TizenTube TV] disableWhosWatching falhou', e);
+}

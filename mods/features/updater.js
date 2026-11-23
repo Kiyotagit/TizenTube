@@ -6,7 +6,14 @@ import { t } from 'i18next';
 
 // If TizenTube is not running on Cobalt, do nothing
 // Add a timeout since reloading the home page while the updater pop up is shown causes the pop up to instantly disappear.
+// TizenTube TV (fork): o APK desta TV é remendado e assinado com outra chave, então baixar
+// o APK oficial por aqui sempre dá "conflito de pacotes". A atualização é feita pelo PC
+// (atualizar_tizentube.py da PonteAndroidTV). Por isso não procura atualização ao abrir,
+// e o botão "Verificar atualizações" só explica isso.
+const ATUALIZA_PELO_PC = true;
+
 setTimeout(() => {
+    if (ATUALIZA_PELO_PC) return;
     if (window.h5vcc && window.h5vcc.tizentube && configRead('enableUpdater')) {
         const currentEpoch = Math.floor(Date.now() / 1000);
         if (configRead('dontCheckUpdateUntil') > currentEpoch) {
@@ -26,6 +33,10 @@ function getLatestRelease() {
 }
 
 function checkForUpdates(showNoUpdateToast) {
+    if (ATUALIZA_PELO_PC) {
+        showToast('TizenTube TV', 'Esta TV usa uma versão ajustada. A atualização é feita pelo PC.');
+        return;
+    }
     const currentAppVersion = window.h5vcc.tizentube.GetVersion();
     const currentEpoch = Math.floor(Date.now() / 1000);
 

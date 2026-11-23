@@ -71,6 +71,12 @@ const defaultConfig = {
   disableEnlargingThumbnails: false,
   enableShrinkingThumbnails: false,
   hideRelatedVideosPlayer: false,
+  // TizenTube TV (fork): conta padrão aprendida na TV (features/contaPadrao.js)
+  contaPadraoAtiva: true,
+  contaPadraoNome: '',
+  contaPadraoFalhas: 0,
+  // TizenTube TV (fork): Histórico incluído uma vez na barra lateral (ui/customGuideAction.js)
+  historicoNaBarraInserido: false,
 };
 
 let localConfig;

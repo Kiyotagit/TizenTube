@@ -21,6 +21,18 @@ JSON.parse = function () {
             }
         }
         if (orderChanged) configWrite('sidebarContentsOrder', order);
+
+        // TizenTube TV (fork): põe o Histórico (com "continuar de onde parei") logo depois
+        // do Início, uma vez só; se a pessoa tirar pelo menu de ordenar, não volta.
+        if (!configRead('historicoNaBarraInserido') && order.length) {
+            if (!order.some(o => (typeof o === 'object' && o !== null ? o.browseId : o) === 'FEhistory')) {
+                const home = order.indexOf('FEwhat_to_watch');
+                order.splice(home >= 0 ? home + 1 : Math.min(1, order.length), 0,
+                    { browseId: 'FEhistory', title: 'Histórico' });
+                configWrite('sidebarContentsOrder', order);
+            }
+            configWrite('historicoNaBarraInserido', true);
+        }
     }
     if (configRead('sidebarContentsOrder')?.length === 0) {
        // Add all of the items in the sidebar to the sidebarContentsOrder
@@ -46,6 +58,8 @@ JSON.parse = function () {
 
             for (const orderItem of order) {
                 if (typeof orderItem === 'object' && orderItem !== null) {
+                    // Se o YouTube já manda esse item, não duplica.
+                    if (copiedItems.some(item => item.guideEntryRenderer?.navigationEndpoint?.browseEndpoint?.browseId === orderItem.browseId)) continue;
                     const customItem = GuideEntryRenderer(
                         orderItem.title,
                         {
@@ -53,7 +67,7 @@ JSON.parse = function () {
                                 browseId: orderItem.browseId
                             }
                         },
-                        'PERSON'
+                        orderItem.browseId === 'FEhistory' ? 'WATCH_HISTORY' : 'PERSON'
                     );
                     copiedItems.push(customItem);
                 }

@@ -263,6 +263,13 @@ export default function modernUI(update, parameters) {
                         {
                             name: t('settings.options.misc.options.whosWatching.options.enableWWOnExit'),
                             value: 'enableWhosWatchingMenuOnAppExit'
+                        },
+                        {
+                            // TizenTube TV (fork): features/contaPadrao.js. Desligar esquece a conta.
+                            name: configRead('contaPadraoNome')
+                                ? `Entrar sozinho em "${configRead('contaPadraoNome')}" ao abrir`
+                                : 'Entrar sozinho na conta padrão (escolha uma vez ao abrir)',
+                            value: 'contaPadraoAtiva'
                         }
                     ]
                 },
