@@ -41,18 +41,22 @@ function forcarSeletor() {
     return configRead('contaPadraoAtiva') && configRead('contaPadraoFalhas') < FALHAS_MAX;
 }
 
-// Ajusta as "ações recorrentes" do YouTube: as telas de boas-vindas ficam escondidas
-// (como o TizenTube já faz) e a de contas fica sempre "vencida" quando a conta padrão
-// está ligada, para aparecer em toda abertura.
+// Ajusta as "ações recorrentes" do YouTube.
+// Regra lida no YouTube TV (23/11/2026): a tela de contas só aparece na abertura se NENHUMA
+// das três telas (contas, boas-vindas sem conta, "bem-vindo de volta") apareceu dentro do
+// intervalo mínimo (servidor; padrão 120 min com várias contas). O TizenTube joga as duas de
+// boas-vindas para o futuro, e isso também bloqueia a de contas. Então:
+// - conta padrão ligada: as três ficam "vencidas" (lastFired antigo) e a tela de contas
+//   aparece em toda abertura; as duas de boas-vindas só existem para quem está SEM conta.
+// - desligada: comportamento do TizenTube (esconder), salvo se a pessoa ligou o menu.
 function ajustarAcoes(dados) {
     const d = dados && dados.data && dados.data.data;
     if (!d) return dados;
     const futuro = Date.now() + 7 * 24 * 60 * 60 * 1000;
-    for (const k of ACOES_ESCONDER) if (d[k]) d[k].lastFired = futuro;
     if (forcarSeletor()) {
-        if (d[ACAO_SELETOR]) d[ACAO_SELETOR].lastFired = 1;
-    } else if (!configRead('enableWhoIsWatchingMenu') && d[ACAO_SELETOR]) {
-        d[ACAO_SELETOR].lastFired = futuro;
+        for (const k of [ACAO_SELETOR].concat(ACOES_ESCONDER)) if (d[k]) d[k].lastFired = 1;
+    } else if (!configRead('enableWhoIsWatchingMenu')) {
+        for (const k of [ACAO_SELETOR].concat(ACOES_ESCONDER)) if (d[k]) d[k].lastFired = futuro;
     }
     return dados;
 }
@@ -219,13 +223,12 @@ function diagnostico(etapa) {
     try {
         const ls = window.localStorage;
         const linhas = [];
-        for (let i = 0; i < ls.length; i++) {
-            const k = ls.key(i);
-            if (/recurring|exit|suspension|identity|account|startup/i.test(k)) {
-                linhas.push(k + ' = ' + String(ls.getItem(k)).slice(0, 1500));
-            }
+        // Só as ações recorrentes: as chaves de identidade guardam códigos de acesso da conta.
+        const acoes = JSON.parse(ls.getItem(CHAVE_ACOES) || '{}');
+        const d = (acoes.data && acoes.data.data) || {};
+        for (const k of [ACAO_SELETOR].concat(ACOES_ESCONDER)) {
+            linhas.push(k + ' = ' + JSON.stringify(d[k] || null));
         }
-        linhas.push('chaves: ' + Object.keys(ls).join(' | '));
         enviar('/diag', etapa + '\n' + linhas.join('\n'));
     } catch (e) {
         enviar('/diag', 'diagnóstico falhou ' + e);
