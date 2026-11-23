@@ -24,14 +24,20 @@ JSON.parse = function () {
 
         // TizenTube TV (fork): põe o Histórico (com "continuar de onde parei") logo depois
         // do Início, uma vez só; se a pessoa tirar pelo menu de ordenar, não volta.
-        if (!configRead('historicoNaBarraInserido') && order.length) {
-            if (!order.some(o => (typeof o === 'object' && o !== null ? o.browseId : o) === 'FEhistory')) {
-                const home = order.indexOf('FEwhat_to_watch');
-                order.splice(home >= 0 ? home + 1 : Math.min(1, order.length), 0,
-                    { browseId: 'FEhistory', title: 'Histórico' });
+        // Valor 2 = posição certa. O valor true veio da 1ª versão, que punha antes do Início
+        // (no YouTube TV o Início é "default", não "FEwhat_to_watch"): reposiciona uma vez.
+        if (configRead('historicoNaBarraInserido') !== 2 && order.length) {
+            const nossos = order.filter(o => typeof o === 'object' && o !== null && o.browseId === 'FEhistory');
+            const nativo = order.includes('FEhistory');
+            if (!nativo) {
+                for (const o of nossos) order.splice(order.indexOf(o), 1);
+                let home = order.indexOf('default');
+                if (home < 0) home = order.indexOf('FEwhat_to_watch');
+                if (home < 0) home = order.findIndex(o => o !== 'search');
+                order.splice(home >= 0 ? home + 1 : order.length, 0, { browseId: 'FEhistory', title: 'Histórico' });
                 configWrite('sidebarContentsOrder', order);
             }
-            configWrite('historicoNaBarraInserido', true);
+            configWrite('historicoNaBarraInserido', 2);
         }
     }
     if (configRead('sidebarContentsOrder')?.length === 0) {
