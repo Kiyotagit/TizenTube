@@ -15,9 +15,7 @@ import "./ui/speedUI.js";
 import "./ui/theme.js";
 import "./ui/settings.js";
 import "./ui/disableWhosWatching.js";
-import "./features/contaPadrao.js"; // TizenTube TV (fork): depois do disableWhosWatching
-import "./features/depuracaoPC.js"; // TizenTube TV (fork): TEMPORÁRIO, canal de testes com o PC
-import "./features/moreSubtitles.js";
+import "./features/contaPadrao.js"; // TizenTube TV (fork): depois do disableWhosWatchingimport "./features/moreSubtitles.js";
 import "./features/captionStylePersistence.js";
 import "./features/updater.js";
 import "./features/pictureInPicture.js";
