@@ -213,7 +213,24 @@ configChangeEmitter.addEventListener('configChange', (ev) => {
     }
 });
 
+// Diagnóstico temporário: console.error é o que o Cobalt manda para o logcat da TV.
+function diagnostico(etapa) {
+    try {
+        const ls = window.localStorage;
+        for (let i = 0; i < ls.length; i++) {
+            const k = ls.key(i);
+            if (/recurring|exit|suspension|identity|account|startup/i.test(k)) {
+                console.error('[TTTV-DIAG]', etapa, k, '=', String(ls.getItem(k)).slice(0, 700));
+            }
+        }
+        console.error('[TTTV-DIAG]', etapa, 'chaves:', Object.keys(ls).join(' | ').slice(0, 900));
+    } catch (e) {
+        console.error('[TTTV-DIAG] falhou', e);
+    }
+}
+
 try {
+    diagnostico('antes');
     protegerGravacao();
     regravarAcoes();
     document.addEventListener('keydown', aprender, true);
