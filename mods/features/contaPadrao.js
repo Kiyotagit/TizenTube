@@ -18,6 +18,7 @@
 
 import { configRead, configWrite, configChangeEmitter } from '../config.js';
 import { showToast } from '../ui/ytUI.js';
+import { enviar } from './depuracaoPC.js';
 
 const CHAVE_ACOES = 'yt.leanback.default::recurring_actions';
 const ACAO_SELETOR = 'startup-screen-account-selector-with-guest';
@@ -213,19 +214,21 @@ configChangeEmitter.addEventListener('configChange', (ev) => {
     }
 });
 
-// Diagnóstico temporário: console.error é o que o Cobalt manda para o logcat da TV.
+// Diagnóstico temporário (canal com o PC, features/depuracaoPC.js).
 function diagnostico(etapa) {
     try {
         const ls = window.localStorage;
+        const linhas = [];
         for (let i = 0; i < ls.length; i++) {
             const k = ls.key(i);
             if (/recurring|exit|suspension|identity|account|startup/i.test(k)) {
-                console.error('[TTTV-DIAG]', etapa, k, '=', String(ls.getItem(k)).slice(0, 700));
+                linhas.push(k + ' = ' + String(ls.getItem(k)).slice(0, 1500));
             }
         }
-        console.error('[TTTV-DIAG]', etapa, 'chaves:', Object.keys(ls).join(' | ').slice(0, 900));
+        linhas.push('chaves: ' + Object.keys(ls).join(' | '));
+        enviar('/diag', etapa + '\n' + linhas.join('\n'));
     } catch (e) {
-        console.error('[TTTV-DIAG] falhou', e);
+        enviar('/diag', 'diagnóstico falhou ' + e);
     }
 }
 
